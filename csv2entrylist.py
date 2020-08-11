@@ -4,51 +4,53 @@ import json
 import sys
 
 
-def add_driver(driver_number: int, row: list, header: dict):
+def add_driver(driver_id: int, row: list, header: dict):
 
     driver = {}
-    try:
-        steamid = header[f"steam id {driver_number}"]
 
-    except IndexError:
-        steamid = None
+    steamid = row[header[f"steam id driver {driver_id}"]]
+    if steamid != "":
 
-    if steamid:
-        try:
-            driver.update({"playerID": row[steamid]})
+        driver.update({"playerID": f"S{steamid}"})
 
-            try:
-                firstName = header[f"first name {driver_number}"]
-                if row[firstName] != " ":
-                    driver.update({"firstName": row[firstName]})
+        if f"first name driver {driver_id}" in header:
 
-                lastName = header[f"last name {driver_number}"]
-                if row[lastName] != " ":
-                    driver.update({"lastName": row[lastName]})
+            firstName = row[header[f"first name driver {driver_id}"]]
+            if firstName != "":
+                driver.update({"firstName": firstName})
 
-                shortName = header[f"short name {driver_number}"]
-                if row[shortName] != " ":
-                    driver.update({"shortName": row[shortName][:3].upper()})
+        if f"last name driver {driver_id}" in header:
 
-            except IndexError:
-                pass
+            lastName = row[header[f"last name driver {driver_id}"]]
+            if lastName != "":
+                driver.update({"lastName": lastName})
 
-        except IndexError:
-            pass
+        if f"short name driver {driver_id}" in header:
+
+            shortName = row[header[f"short name driver {driver_id}"]]
+            if shortName != "":
+                driver.update({"shortName": shortName.upper()})
 
     return driver
 
 
-def generate_entry_json(entry_list: dict, header: dict,
-                        entry_csv: list, car_model: dict):
+def generate_entry_json(header: dict, entry_csv: list,
+                        car_model: dict, max_driver: int):
+
+    entry_list = {
+        "entries": [],
+        "forceEntryList": 1
+        }
 
     for team_row in entry_csv:
+
+        # pprint.pprint(team_row)
         team = {
             "drivers": [],
             "raceNumber": int(team_row[header["car number"]]),
             "forcedCarModel": car_model[team_row[header["car model"]].lower()],
             "overrideDriverInfo": 1,
-            "defaultGridPosition": -1,
+            # "defaultGridPosition": -1,
             # "ballastKg": 0,
             # "restrictor": 0,
             # "customCar": "",
@@ -56,8 +58,7 @@ def generate_entry_json(entry_list: dict, header: dict,
             "isServerAdmin": 0
         }
 
-        # pprint.pprint(header)
-        for i in range(1, 5):
+        for i in range(1, max_driver + 1):
             driver = add_driver(i, team_row, header)
             if driver != {}:
                 team["drivers"].append(driver)
@@ -80,15 +81,16 @@ def csv2entrylist(csv_path: str, car_ids_path: str = "car_model_list.json"):
         csv_header = next(entry_csv)
 
         header = {}
-        for i in csv_header:
-            header.update({i.lower(): csv_header.index(i)})
+        max_driver = 0
+        for column_id, column_name in enumerate(csv_header):
 
-        entry_list = {
-                "entries": [],
-                "forceEntryList": 1
-                }
+            header.update({column_name.lower(): column_id})
+            if column_name.lower().startswith("steam"):
+                max_driver += 1
 
-        generate_entry_json(entry_list, header, entry_csv, car_model)
+        # pprint.pprint(header)
+
+        generate_entry_json(header, entry_csv, car_model, max_driver)
 
 
 if __name__ == "__main__":
