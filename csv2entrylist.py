@@ -71,7 +71,7 @@ def generate_entry_json(header: dict, entry_csv: list,
         json.dump(entry_list, entry_json_fp, indent=4)
 
 
-def csv2entrylist(csv_path: str, car_ids_path: str = "car_model_list.json"):
+def csv2entrylist(csv_path: str, car_ids_path: str = "car_model.json"):
 
     with open(car_ids_path) as car_model_fp:
         car_model = json.load(car_model_fp)
