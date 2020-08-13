@@ -1,3 +1,5 @@
+# Version 0.2
+
 import csv
 import json
 import argparse
@@ -39,7 +41,7 @@ def generate_entry_json(header: dict, entry_csv: list,
     entry_list = {
         "entries": [],
         "forceEntryList": 1
-        }
+    }
 
     for team_row in entry_csv:
 
@@ -74,6 +76,9 @@ def generate_entry_json(header: dict, entry_csv: list,
 
 
 def read_csv(csv_path: str):
+    """
+    Read csv file and return the header + the data.
+    """
 
     with open(csv_path) as entry_fp:
         entry_csv = csv.reader(entry_fp)
@@ -91,8 +96,11 @@ def read_csv(csv_path: str):
 
 
 def get_args():
+    """
+    Handle command line arguments.
+    """
 
-    desc = "Convert csv file to an entry list for ACC"
+    desc = "Convert csv file to an entry list for ACC V0.2"
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument("path_to_csv")
 
@@ -101,8 +109,6 @@ def get_args():
 
     help_carid = "path to car_model.json"
     parser.add_argument("-carid", default="./car_model.json", help=help_carid)
-
-    # parser.add_argument("-DEBUG", action="store_true")
 
     return parser.parse_args()
 
@@ -130,5 +136,4 @@ if __name__ == "__main__":
     else:
         admin = args.admin
 
-    print(admin)
     generate_entry_json(header, registration, car_model, max_driver, admin)
