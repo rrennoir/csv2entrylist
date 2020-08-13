@@ -7,3 +7,9 @@ this add:
 * Nordschleife
 * Nothing else
 
+## Version 0.2
+this add:
+* Even more trash code
+* Command line args
+* Ability to add admin rights
+* Version number that make no sense
